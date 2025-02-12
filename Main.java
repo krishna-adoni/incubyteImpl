@@ -1,18 +1,31 @@
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Main {
     public static void main(String[] args) {
-        System.out.println("Sum: " + add("1,2,3,4"));
+        System.out.println("Sum: " + add("//;\n1;2"));
     }
     
-    static int add(String numbers)
-    {
-        int sum = numbers.isEmpty() ? 0 : 
-                  Arrays.stream(numbers.split(","))  // Split the string by ";"
-                        .mapToInt(Integer::parseInt) // Convert each part to an integer
-                        .sum(); // Sum up the integers
+    public static int add(String input) {
+        if (input.isEmpty()) {
+            return 0;
+        }
 
-        return sum;
-        
+        String delimiter = "[,;\n]"; // Default delimiters: comma, semicolon, newline
+        String numbers = input;
+
+        // Check for a custom delimiter at the beginning of the input
+        Pattern pattern = Pattern.compile("//(.)\n(.*)");
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.matches()) {
+            delimiter = Pattern.quote(matcher.group(1)); // Extract and escape the custom delimiter
+            numbers = matcher.group(2); // Extract the actual numbers part
+        }
+
+        return Arrays.stream(numbers.split(delimiter))
+                     .mapToInt(Integer::parseInt)
+                     .sum();
     }
 }
